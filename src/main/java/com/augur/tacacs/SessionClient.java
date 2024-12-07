@@ -1,6 +1,8 @@
 package com.augur.tacacs;
 
 
+import com.sun.org.slf4j.internal.Logger;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -15,7 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class SessionClient extends Session
 {
     private static final int TIMEOUT_MILLIS = 5000; // TODO: don't hard-code
-	private final DebugLogger logger;
+	private final Logger logger;
 	private UserInterface ui;
 	private final boolean singleConnect;
 	private byte headerFlags;
@@ -26,7 +28,7 @@ public class SessionClient extends Session
 	//private String password;
 
 	/** Client-side constructor; end-user should use newSession() in TacacsReader. */
-	SessionClient(TAC_PLUS.AUTHEN.SVC svc, String port, String rem_addr, byte priv_lvl, TacacsReader tacacs, boolean singleConnect, boolean unencrypted, DebugLogger debugLogger)
+	SessionClient(TAC_PLUS.AUTHEN.SVC svc, String port, String rem_addr, byte priv_lvl, TacacsReader tacacs, boolean singleConnect, boolean unencrypted, Logger debugLogger)
 	{
 		this(svc, port, rem_addr, priv_lvl, tacacs, null, singleConnect, unencrypted, debugLogger);
 	}
@@ -36,7 +38,7 @@ public class SessionClient extends Session
 	 * Only needed for interactive (ASCII) login,
 	 * which needs to prompt user for info via a UserInterface.
 	 */
-	SessionClient(TAC_PLUS.AUTHEN.SVC svc, String port, String rem_addr, byte priv_lvl, TacacsReader tacacs, UserInterface ui, boolean singleConnect, boolean unencrypted, DebugLogger debugLogger)
+	SessionClient(TAC_PLUS.AUTHEN.SVC svc, String port, String rem_addr, byte priv_lvl, TacacsReader tacacs, UserInterface ui, boolean singleConnect, boolean unencrypted, Logger debugLogger)
 	{
 		super(svc, port, rem_addr, priv_lvl, tacacs, null);
 		this.ui = ui;
@@ -53,7 +55,7 @@ public class SessionClient extends Session
 
 	/**
 	 * @return A boolean indicating if the first packet received during this session had the SINGLE_CONNECT flag set
-	 * @see TACACS+ specification, section 3.3 "Single Connect Mode"
+	 * See also: TACACS+ specification, section 3.3 "Single Connect Mode"
 	 */
 	@Override boolean isSingleConnectMode()
 	{
@@ -67,7 +69,7 @@ public class SessionClient extends Session
 	 */
 	@Override synchronized void handlePacket(Packet p) throws IOException {
 		super.handlePacket(p); // stores firstPacket, for isSingleConnectMode()
-		if (logger != null) { logger.debug("RCV <-- "+p); }
+		if (logger != null) { logger.warn("RCV <-- "+p); }
 		switch(p.header.type)
 		{
 			case AUTHEN: // must be a Reply from the server
@@ -219,7 +221,7 @@ public class SessionClient extends Session
 
 	/**
 	 * Authenticates the client using PAP.
-	 * @see The TACACS+ Protocol IETF draft, currently at https://www.ietf.org/id/draft-ietf-opsawg-tacacs-06.txt
+	 * See also the TACACS+ Protocol IETF draft, currently at https://www.ietf.org/id/draft-ietf-opsawg-tacacs-06.txt
 	 *
 	 * @param username
 	 * @param password
@@ -252,8 +254,8 @@ public class SessionClient extends Session
 	 * network (which PAP does), although the packet is already encrypted, so
 	 * it's just extra protection.
 	 *
-	 * @see The TACACS+ Protocol IETF draft, currently at https://www.ietf.org/id/draft-ietf-opsawg-tacacs-06.txt
-	 * @see The RFC 1334 Section 3 for some details of the CHAP protocol.
+	 * See also: the TACACS+ Protocol IETF draft, currently at https://www.ietf.org/id/draft-ietf-opsawg-tacacs-06.txt
+	 * See also: the RFC 1334 Section 3 for some details of the CHAP protocol.
 	 *
 	 * @param username
 	 * @param password

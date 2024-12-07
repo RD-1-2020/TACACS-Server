@@ -1,4 +1,6 @@
 package com.augur.tacacs; // You would be coding in a different package
+import com.sun.org.slf4j.internal.Logger;
+
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.rmi.AccessException;
@@ -39,10 +41,10 @@ public class ExampleClient
 	 * @throws IOException if there is any underlying problem contacting the
 	 *   TACACS+ server
 	 */
-	public String login(String tacacsHost, String tacacsKey, String username, String password, DebugLogger debugLogger) throws IOException, AccessException, TimeoutException, InvalidObjectException
+	public String login(String tacacsHost, String tacacsKey, String username, String password, Logger debugLogger) throws IOException, AccessException, TimeoutException, InvalidObjectException
 	{
 		TacacsClient tc = new TacacsClient(tacacsHost, tacacsKey, 10000, false); // 10 second time-out for contacting TACACS+, and don't attempt single-connect for test simplicity
-		tc.setDebugLogger(debugLogger);
+		tc.setLogger(debugLogger);
 		SessionClient authenSession = tc.newSession(TAC_PLUS.AUTHEN.SVC.LOGIN, "console", "localhost", TAC_PLUS.PRIV_LVL.USER.code()); // IO or Timeout exceptions if can't contact TACACS+
 		AuthenReply authentication = authenSession.authenticate_PAP(username, password);
 		if (authentication.isOK())

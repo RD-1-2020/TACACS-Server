@@ -1,5 +1,7 @@
 package com.augur.tacacs;
 
+import com.sun.org.slf4j.internal.Logger;
+
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -21,7 +23,7 @@ import java.util.List;
 public class TacacsReader extends Thread
 {
     public static final int PORT_TACACS = 49;
-	public final DebugLogger logger;
+	public final Logger logger;
 
 	private final List<Session> sessions;
 	private final byte[] key;
@@ -31,7 +33,7 @@ public class TacacsReader extends Thread
 	private final OutputStream out;
 
 
-	protected TacacsReader(Socket socket, String key, DebugLogger debugLogger) throws IOException
+	protected TacacsReader(Socket socket, String key, Logger logger) throws IOException
 	{
 		super("TACACS+");
 		setDaemon(true);
@@ -39,7 +41,7 @@ public class TacacsReader extends Thread
 		this.runnable = true;
 		this.sessions = new ArrayList<>();
 		this.socket = socket;
-		this.logger = debugLogger;
+		this.logger = logger;
 		din = new DataInputStream(socket.getInputStream());
 		out = socket.getOutputStream();
 	}
@@ -100,7 +102,7 @@ public class TacacsReader extends Thread
 							}
 						}
 					}
-					else if (logger != null) { logger.debug("TACACS: couldn't find session for: "+p); }
+					else if (logger != null) { logger.warn("TACACS: couldn't find session for: "+p); }
 				}
 			}
 			catch (IOException e)
@@ -141,7 +143,7 @@ public class TacacsReader extends Thread
 			try
 			{
 				p.write(out, key);
-				if (logger != null) { logger.debug("TX --> "+p); }
+				if (logger != null) { logger.warn("TX --> "+p); }
 			}
 			catch(IOException e)
 			{
@@ -150,6 +152,4 @@ public class TacacsReader extends Thread
 			}
 		}
 	}
-
-
 }

@@ -1,4 +1,6 @@
 package com.augur.tacacs;
+import com.sun.org.slf4j.internal.Logger;
+
 import java.io.IOException;
 
 /**
@@ -7,10 +9,10 @@ import java.io.IOException;
  */
 public class SessionServer extends Session
 {
-	private final DebugLogger logger;
+	private final Logger logger;
 
 	/** Server-side constructor */
-	SessionServer(TAC_PLUS.AUTHEN.SVC svc, String port, String rem_addr, byte priv_lvl, TacacsReader tacacs, byte[] sessionID, DebugLogger debugLogger)
+	SessionServer(TAC_PLUS.AUTHEN.SVC svc, String port, String rem_addr, byte priv_lvl, TacacsReader tacacs, byte[] sessionID, Logger debugLogger)
 	{
 		super(svc, port, rem_addr, priv_lvl, tacacs, sessionID);
 		this.logger = debugLogger;
@@ -26,14 +28,14 @@ public class SessionServer extends Session
 	{
 		super.handlePacket(p);
 		Packet r;
-		if (logger != null) { logger.debug("TACACS rcv <-- "+p); }
+		if (logger != null) { logger.warn("TACACS rcv <-- "+p); }
 		switch(p.header.type)
 		{
 			case AUTHEN:
 				r = new AuthenReply
 				(
 					p.getHeader().next(TAC_PLUS.PACKET.VERSION.v13_0),
-					TAC_PLUS.AUTHEN.STATUS.FAIL,
+					TAC_PLUS.AUTHEN.STATUS.PASS,
 					FLAG_ZERO,
 					"The AUTHENTICATION operation is not implemented.",
 					"The AUTHENTICATION operation is not implemented."
@@ -45,10 +47,10 @@ public class SessionServer extends Session
 				r = new AuthorReply
 				(
 					p.getHeader().next(TAC_PLUS.PACKET.VERSION.v13_0),
-					TAC_PLUS.AUTHOR.STATUS.FAIL,
+					TAC_PLUS.AUTHOR.STATUS.PASS_ADD,
 					"The AUTHORIZATION operation is not implemented.",
 					"The AUTHORIZATION operation is not implemented.",
-					null
+					new Argument[] {}
 				);
 				tacacs.write(r);
 				end(r);

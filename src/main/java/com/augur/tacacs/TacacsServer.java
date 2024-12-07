@@ -1,5 +1,8 @@
 package com.augur.tacacs;
 
+import com.sun.org.slf4j.internal.Logger;
+import com.sun.org.slf4j.internal.LoggerFactory;
+
 import java.net.Socket;
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -23,7 +26,7 @@ public class TacacsServer extends TacacsReader
 {
 
 
-	private TacacsServer(Socket socket, String key,DebugLogger debugLogger) throws IOException
+	private TacacsServer(Socket socket, String key, Logger debugLogger) throws IOException
 	{
 		super(socket, key, debugLogger);
 	}
@@ -33,12 +36,13 @@ public class TacacsServer extends TacacsReader
 
 	public static void main(String[] args) throws IOException, TimeoutException
 	{
-		String key = args[0];
+		String key = "testing123";
 		try (ServerSocket ss = new ServerSocket(PORT_TACACS)) {
             while (true)
             {
             	Socket s = ss.accept();
-            	TacacsServer ts = new TacacsServer(s, key, null);
+				Logger logger1 = LoggerFactory.getLogger(TacacsServer.class);
+				TacacsServer ts = new TacacsServer(s, key, logger1);
             	ts.start();
             }
         }

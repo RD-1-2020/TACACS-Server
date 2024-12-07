@@ -1,5 +1,8 @@
 package com.augur.tacacs;
 
+import com.sun.org.slf4j.internal.Logger;
+import com.sun.org.slf4j.internal.LoggerFactory;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -38,7 +41,7 @@ public class TacacsClient extends Object
 	final boolean unencrypted;
 	/** Note: instance methods are synchronized to protect access to tacacs. */
 	private TacacsReader tacacs;
-	private DebugLogger logger;
+	private Logger logger;
 
 	/**
 	 * Constructs a new TacacsClient that may be used for multiple calls to newSession().
@@ -126,18 +129,16 @@ public class TacacsClient extends Object
      *
      * @param logger
      */
-    public void setDebugLogger(DebugLogger logger) {
+    public void setLogger(Logger logger) {
         this.logger = logger;
     }
 
     /**
      * Sets a debug logger for the client, which is used to output detailed debugging information about
      * the auth process. Uses standard Java logging, with logger name derived from given class name.
-     *
-     * @param logger
      */
-    public void setDebugLogger(Class<?> cl) {
-        this.logger = new StandardJavaLogger(cl.getName());
+    public void setLogger(Class<?> cl) {
+        this.logger = LoggerFactory.getLogger(cl);
     }
 
     /**
@@ -265,7 +266,7 @@ public class TacacsClient extends Object
 			String host = args.length>0 ? args[0] : null;
 			String key = args.length>1 ? args[1] : "augur.com";
 			TacacsClient tc = new TacacsClient(host, key);
-			tc.setDebugLogger(TacacsClient.class);
+			tc.setLogger(TacacsClient.class);
 
 			// substitute another example here for testing
 			exampleAuthenInteractive(args, tc);
@@ -397,7 +398,7 @@ public class TacacsClient extends Object
 
 	private void debug(String msg) {
 	    if (logger != null) {
-	        logger.debug(msg);
+	        logger.warn(msg);
 	    }
 	}
 

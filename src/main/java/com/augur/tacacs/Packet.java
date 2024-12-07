@@ -1,4 +1,6 @@
 package com.augur.tacacs;
+import com.sun.org.slf4j.internal.Logger;
+
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -49,7 +51,7 @@ public abstract class Packet
 	 * @return A Packet subclass instance: AuthenReply, AcctReply, or AuthorReply
 	 * @throws IOException
 	 */
-	public static Packet readNext(TacacsReader tacacs, byte[] key, DebugLogger logger) throws IOException
+	public static Packet readNext(TacacsReader tacacs, byte[] key, Logger logger) throws IOException
 	{
 		byte[] headerBytes = new byte[12];
 //		System.out.println("Waiting to read a header...");
